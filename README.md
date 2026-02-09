@@ -530,6 +530,16 @@ Search for documents containing at least one of the keywords in the given attrib
 
 ---
 
+### 🚀 Try it on Aisuru!
+
+This MCP server is easily integrated into [aisuru](https://aisuru.com/), our AI agent platform where you can create, test, and deploy intelligent agents with access to powerful tools like this mcp-sharepoint server.
+
+![Failed to load image](assets/aisuru_mcp_integration_1.png)
+
+Visit [Aisuru.com](https://aisuru.com/) to start building with your agents today!
+
+---
+
 ## ⚠️ Known limitations
 
 * Partial document updates are not supported
