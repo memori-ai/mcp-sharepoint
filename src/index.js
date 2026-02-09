@@ -24,7 +24,6 @@ const server = new Server(
 
 const authParams = {
   type: "object",
-  optional: true,
   description: "Microsoft Entra ID app authentication parameters",
   properties: {
     tenantId: {
@@ -40,7 +39,7 @@ const authParams = {
       description: "The client secret",
     },
   },
-}
+};
 
 const siteDriveParams = {
   type: "object",
@@ -149,7 +148,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             auth: authParams,
             siteDrive: siteDriveParams,
-            filePath: { type: "string", description: "The path where the file will be uploaded (e.g., 'Cartella_1/file.docx')" },
+            filePath: { type: "string", description: "The path where the file will be uploaded (e.g., 'Cartella_1')" },
             content: { type: "string", description: "The string or base64-encoded content of the file to upload" },
             contentType: { type: "string", description: "The MIME type of the content (e.g., 'application/pdf')" },
             overwrite: { type: "boolean", description: "Whether to overwrite existing files" },
@@ -194,7 +193,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             auth: authParams,
             siteDrive: siteDriveParams,
             listId: { type: "string", description: "The ID of the SharePoint list to search in" },
-            keywords: { type: "array", items: { type: "string" }, description: "List of keywords to search for" },
+            keywords: { type: "array", items: { type: "string" }, description: "Array of keywords to search for" },
             attributeName: { type: "string", description: "The document attribute to search in (e.g., 'name', 'content')" },
           },
           required: ["auth", "siteDrive", "listId", "keywords", "attributeName"],

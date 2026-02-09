@@ -103,16 +103,54 @@ These depends on the Sharepoint you are using.
 
 ### `common parameters`
 
-* `authParams`: {  
-    clientId\<string\>,  
-    clientSecret\<string\>,  
-    tenantId\<string\>  
-  }
+```
+// Microsoft Entra ID app authentication parameters
 
-* `siteDriveParams`: {  
-    siteId\<string\>,  
-    driveId\<string\>  
+authParams: {
+  {
+    "name": "clientId",
+    "type": "string",
+    "required": "true",
+    "descrciption": "The application (client) ID",
+    "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+  },
+  {
+    "name": "clientSecret",
+    "type": "string",
+    "required": "true",
+    "descrciption": "The client secret",
+    "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+  },
+  {
+    "name": "tenantId",
+    "type": "string",
+    "required": "true",
+    "descrciption": "The directory (tenant) ID",
+    "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
   }
+}
+```
+
+```
+// SharePoint site and drive identifiers
+
+siteDriveParams: {
+  {
+    "name": "siteId",
+    "type": "string",
+    "required": "true",
+    "descrciption": "The ID of the SharePoint site",
+    "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+  },
+  {
+    "name": "driveId",
+    "type": "string",
+    "required": "true",
+    "descrciption":" The ID of the drive within the SharePoint site",
+    "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
+  }
+}
+```
 
 ### 📁 Folders
 
@@ -121,10 +159,29 @@ These depends on the Sharepoint you are using.
 List folders in a given path.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `path`\<string\>
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "path",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The path in SharePoint to retrieve folders from",
+  "example": "cartella_1/cartella_2"
+}
+```
 
 ---
 
@@ -133,12 +190,36 @@ List folders in a given path.
 Create a new folder.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `path`\<string\>
-* `folderName`\<string\>
-
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "path",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The parent path where the folder will be created",
+  "example": "cartella_1/cartella_2"
+},
+{
+  "name": "folderName",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The name of the new folder to create",
+  "example": "cartella_3"
+}
+```
 ---
 
 #### `deleteFolder`
@@ -146,11 +227,29 @@ Create a new folder.
 Delete a folder **only if it is empty**.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `path`\<string\>
-
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "path",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The path to the folder to delete",
+  "example": "cartella_1/cartella_2/cartella_3"
+}
+```
 ---
 
 #### `getFolderTree`
@@ -158,12 +257,36 @@ Delete a folder **only if it is empty**.
 Retrieve the folder tree structure.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `path`\<string\> (optional, default: "root")
-* `maxDepth`\<number\> (optional, default: 10)
-
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "path",
+  "type": "string",
+  "required": "false",
+  "descrciption": "The starting path (default: 'root')",
+  "example": "cartella_1/cartella_2"
+},
+{
+  "name": "maxDepth",
+  "type": "number",
+  "required": "false",
+  "descrciption": "Maximum depth to traverse (default: 10)",
+  "example": 5
+}
+```
 ---
 
 ### 📄 Documents
@@ -173,11 +296,29 @@ Retrieve the folder tree structure.
 List documents in a folder.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `path`\<string\>
-
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "path",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The path in SharePoint to retrieve documents from",
+  "example": "cartella_1/cartella_2"
+}
+```
 ---
 
 #### `getDocumentContent`
@@ -190,11 +331,29 @@ Supported formats:
 * Word / Excel / PowerPoint (converted to PDF via Graph)
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `filePath`\<string\>
-
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "filePath",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The path to the file",
+  "example": "cartella_1/cartella_2/file.txt"
+}
+```
 ---
 
 #### `uploadDocument`
@@ -202,13 +361,50 @@ Supported formats:
 Upload a new document.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `filePath`\<string\>
-* `content`\<string\> (text or base64)
-* `contentType`\<string\> (optional, default = 'application/octet-stream')
-* `overwrite`\<boolean\> (optional, default = false)
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "filePath",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The path where the file will be uploaded",
+  "example": "cartella_1/cartella_2"
+},
+{
+  "name": "content",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The string or base64-encoded content of the file to upload",
+  "example": "Questo è il testo del doc .txt"
+},
+{
+  "name": "contentType",
+  "type": "string",
+  "required": "false",
+  "descrciption": "The MIME type of the content (default: 'application/octet-stream')",
+  "example": "application/octet-stream"
+},
+{
+  "name": "overwrite",
+  "type": "boolean",
+  "required": "false",
+  "descrciption": "Whether to overwrite existing files (default: false)",
+  "example": true
+}
+```
 
 ---
 
@@ -220,13 +416,43 @@ Fully update an existing document.
 > ⚠️ The operation fails if the file does not exist.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `filePath`\<string\>
-* `content`\<string\>
-* `contentType`\<string\> (optional, default = 'application/octet-stream')
-
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "filePath",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The path to the existing file to update",
+  "example": "cartella_1/cartella_2"
+},
+{
+  "name": "content",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The new string or base64-encoded content of the file",
+  "example": "Questo è il nuovo testo del doc .txt"
+},
+{
+  "name": "contentType",
+  "type": "string",
+  "required": "false",
+  "descrciption": "The MIME type of the content (default: 'application/octet-stream')",
+  "example": "application/pdf"
+}
+```
 ---
 
 #### `deleteDocument`
@@ -234,11 +460,29 @@ Fully update an existing document.
 Delete a document (moved to the SharePoint recycle bin).
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `filePath`\<string\>
-
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "filePath",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The path to the file to delete",
+  "example": "cartella_1/cartella_2/file.docx"
+},
+```
 ---
 
 #### `searchDocumentsByKeywords`
@@ -246,12 +490,43 @@ Delete a document (moved to the SharePoint recycle bin).
 Search for documents containing at least one of the keywords in the given attribute.
 
 **Input**:
-
-* `auth`\<authParams\>
-* `siteDrive`\<siteDriveParams\>
-* `listId`\<string\>
-* `keywords`\<Array\<string\>\>
-* `attributeName`\<string\>
+```
+{
+  "name": "auth",
+  "type": "authParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "siteDrive",
+  "type": "siteDriveParams",
+  "required": "true",
+  "descrciption": "refer to the `common parameters` section",
+  "example": "refer to the `common parameters` section"
+},
+{
+  "name": "listId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint list to search in",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "keywords",
+  "type": "Array<string>",
+  "required": "true",
+  "descrciption": "Array of keywords to search for",
+  "example": "["word_1", "word_2", "word_3"]"
+},
+{
+  "name": "attributeName",
+  "type": "string",
+  "required": "true",
+  "descrciption": The document attribute to search in",
+  "example": "name"
+},
+```
 
 ---
 
