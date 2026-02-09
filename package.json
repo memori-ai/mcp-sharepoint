@@ -1,12 +1,15 @@
 {
-  "name": "aisuru-mcp-server-sharepoint",
+  "name": "@memori.ai/mcp-sharepoint",
   "version": "1.0.0",
   "description": "MCP server that executes Sharepoint apis",
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "aisuru-mcp-server-sharepoint": "src/index.js"
+    "mcp-sharepoint": "src/index.js"
   },
+  "files": [
+    "src"
+  ],
   "scripts": {
     "start": "node src/index.js"
   },
@@ -17,7 +20,7 @@
     "sharepoint"
   ],
   "author": "alessio mordini",
-  "license": "",
+  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0",
     "axios": "^1.13.4",
