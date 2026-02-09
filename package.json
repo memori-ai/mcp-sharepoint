@@ -1,0 +1,28 @@
+{
+  "name": "aisuru-mcp-server-sharepoint",
+  "version": "1.0.0",
+  "description": "MCP server that executes Sharepoint apis",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "aisuru-mcp-server-sharepoint": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "javascript",
+    "sharepoint"
+  ],
+  "author": "alessio mordini",
+  "license": "",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "axios": "^1.13.4",
+    "isolated-vm": "^5.0.0",
+    "node-fetch": "^3.3.2",
+    "pdf-parse": "^2.4.5"
+  }
+}
