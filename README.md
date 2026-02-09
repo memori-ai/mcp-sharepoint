@@ -1,4 +1,4 @@
-# aisuru-mcp-server-sharepoint
+# mcp-sharepoint
 
 A **Model Context Protocol (MCP) server** that exposes core **Microsoft SharePoint / Microsoft Graph API** functionalities as tools usable by LLM agents (e.g. Claude Desktop).
 
