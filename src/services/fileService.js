@@ -6,21 +6,24 @@ import { PDFParse } from 'pdf-parse';
 
 /**
  * List all documents and their metadata in a specified path in SharePoint.
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+* @param {string} tenantId - tenant ID
+* @param {string} clientId - application (client) ID
+* @param {string} clientSecret - application secret
+* @param {string} siteId - SharePoint site ID
+* @param {string} driveId - SharePoint drive ID
  * @param {string} path - The path in SharePoint to retrieve documents from.
  * @returns {Promise<Array>} - A promise that resolves to an array of document objects with metadata.
  */
-export async function getDocuments(authParams, siteDrive, path) {
+export async function getDocuments(tenantId, clientId, clientSecret, siteId, driveId, path) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     let url = "";
     
     if (!path || path === "/" || path.toLowerCase() === "root") {
-      url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root/children`;
+      url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root/children`;
     } else {
       const cleanPath = path.replace(/^\/|\/$/g, '');
-      url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/children`;
+      url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/children`;
     }
     
     const response = await axios.get(url, {
@@ -43,18 +46,21 @@ export async function getDocuments(authParams, siteDrive, path) {
 /**
  * Get the content of a document in SharePoint, supporting multiple formats (PDF, Word, Excel).
  * Converts Word and Excel files to PDF automatically and extracts text.
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
+ * @param {string} driveId - SharePoint drive ID
  * @param {string} filePath - The path to the file (e.g., "Cartella_1/file.docx").
  * @returns {Promise<Object>} - A promise that resolves to the file content as text and metadata.
  */
-export async function getDocumentContent(authParams, siteDrive, filePath) {
+export async function getDocumentContent(tenantId, clientId, clientSecret, siteId, driveId, filePath) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     const cleanPath = filePath.replace(/^\/|\/$/g, '');
     
     // URL per ottenere i metadati del file
-    const metadataUrl = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}?$select=name,file,size`;
+    const metadataUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}?$select=name,file,size`;
     
     const metadataResponse = await axios.get(metadataUrl, {
       headers: {
@@ -120,17 +126,20 @@ export async function getDocumentContent(authParams, siteDrive, filePath) {
 
 /**
  * Upload a document to SharePoint (text or binary).
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
+ * @param {string} driveId - SharePoint drive ID
  * @param {string} filePath - e.g. "Cartella_1/file.txt"
  * @param {string|Buffer} content - Text or binary content
  * @param {string} contentType - MIME type of the content
  * @param {boolean} overwrite - Whether to overwrite existing files
  * @returns {Promise<Object>}
  */
-export async function uploadDocument(authParams, siteDrive, filePath, content, contentType = 'application/octet-stream', overwrite = false) {
+export async function uploadDocument(tenantId, clientId, clientSecret, siteId, driveId, filePath, content, contentType = 'application/octet-stream', overwrite = false) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     const cleanPath = filePath.replace(/^\/|\/$/g, '');
     
     const isBinary = contentType && !contentType.startsWith('text/');
@@ -140,7 +149,7 @@ export async function uploadDocument(authParams, siteDrive, filePath, content, c
         ? Buffer.from(content, 'base64')
         : Buffer.from(content, 'utf-8');
     
-    const uploadUrl = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/content` +
+    const uploadUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/content` +
     (overwrite ? '' : '?@microsoft.graph.conflictBehavior=fail');
     
     const response = await axios.put(uploadUrl, buffer, {
@@ -172,22 +181,28 @@ export async function uploadDocument(authParams, siteDrive, filePath, content, c
  * Update the content of an existing document in SharePoint. Replaces the entire content.
  * Fails if the document does not already exist.
  *
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
+ * @param {string} driveId - SharePoint drive ID
  * @param {string} filePath - e.g. "Cartella_1/file.txt"
  * @param {string|Buffer} content - New content
  * @param {string} contentType - MIME type
  * @returns {Promise<Object>}
  */
 export async function updateDocumentContent(
-  authParams,
-  siteDrive,
+  tenantId,
+  clientId,
+  clientSecret,
+  siteId,
+  driveId,
   filePath,
   content,
   contentType = 'application/octet-stream'
 ) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     const cleanPath = filePath.replace(/^\/|\/$/g, '');
 
     // Determina se è binario dal contentType
@@ -198,7 +213,7 @@ export async function updateDocumentContent(
         ? Buffer.from(content, 'base64')
         : Buffer.from(content, 'utf-8');
 
-    const updateUrl = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/content`;
+    const updateUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/content`;
 
     const response = await axios.put(updateUrl, buffer, {
       headers: {
@@ -233,16 +248,19 @@ export async function updateDocumentContent(
  * Delete a document from SharePoint by path.
  * Fails if the document does not exist.
  *
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
+ * @param {string} driveId - SharePoint drive ID
  * @param {string} filePath - e.g. "Cartella_1/file.txt"
  * @returns {Promise<{deleted: boolean, path: string}>}
  */
-export async function deleteDocument(authParams, siteDrive, filePath) {
+export async function deleteDocument(tenantId, clientId, clientSecret, siteId, driveId, filePath) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     const cleanPath = filePath.replace(/^\/|\/$/g, '');   
-    const deleteUrl = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}`;    
+    const deleteUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}`;    
 
     await axios.delete(deleteUrl, {
       headers: {
@@ -270,19 +288,21 @@ export async function deleteDocument(authParams, siteDrive, filePath) {
 
 /**
  * Search for documents in Sharepoint containing the specified keywords in the specified attribute.
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
  * @param {string} listId - The ID of the SharePoint list to search in.
  * @param {string[]} keywords - An array of keywords to search for.
  * @param {string} attributeName - The attribute name to search in (e.g., "name", "fileType").
  * @returns {Promise<Array>} - A promise that resolves to an array of matching document objects.
  */
-export async function searchDocumentsByKeywords(authParams, siteDrive, listId, keywords, attributeName) {
+export async function searchDocumentsByKeywords(tenantId, clientId, clientSecret, siteId, listId, keywords, attributeName) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     
     let allItems = [];
-    let nextLink = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/lists/${listId}/items?$expand=fields,driveItem&$select=id,fields,driveItem`;
+    let nextLink = `https://graph.microsoft.com/v1.0/sites/${siteId}/lists/${listId}/items?$expand=fields,driveItem&$select=id,fields,driveItem`;
 
     // Gestione della paginazione con @odata.nextLink
     while (nextLink) {

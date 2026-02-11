@@ -3,21 +3,24 @@ import axios from 'axios';
 
 /**
 * Retrieve a list of folders from the specified path in SharePoint.
-* @param {object} authParams - Microsoft Entra ID app authentication parameters.
-* @param {object} siteDrive - SharePoint site and drive identifiers.
+* @param {string} tenantId - tenant ID
+* @param {string} clientId - application (client) ID
+* @param {string} clientSecret - application secret
+* @param {string} siteId - SharePoint site ID
+* @param {string} driveId - SharePoint drive ID
 * @param {string} path - The path in SharePoint to retrieve folders from.
 * @returns {Promise<Array>} - A promise that resolves to an array of folder objects.
 */
-export async function getFolders(authParams, siteDrive, path) {
+export async function getFolders(tenantId, clientId, clientSecret, siteId, driveId, path) {
   try {
     let url = ""
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret); // Ottieni il token di accesso
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret); // Ottieni il token di accesso
     if (!path  || path === "/" || path.toLowerCase() === "root") {
-      url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root/children?$filter=folder ne null`;
+      url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root/children?$filter=folder ne null`;
     } else {
       // Rimuovi eventuali slash iniziali o finali dal percorso
       const cleanPath = path.replace(/^\/|\/$/g, '');
-      url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/children?$filter=folder ne null`;
+      url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/children?$filter=folder ne null`;
     }
     const response = await axios.get(url, {
       headers: {
@@ -35,22 +38,25 @@ export async function getFolders(authParams, siteDrive, path) {
 
 /**
  * Create a new folder in SharePoint at the specified path.
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
+ * @param {string} driveId - SharePoint drive ID
  * @param {string} path - The parent path where the folder will be created.
  * @param {string} folderName - The name of the new folder to create.
  * @returns {Promise<Object>} - A promise that resolves to the created folder object.
  */
-export async function createFolder(authParams, siteDrive, path, folderName) {
+export async function createFolder(tenantId, clientId, clientSecret, siteId, driveId, path, folderName) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     let url = "";
     
     if (!path || path === "/" || path.toLowerCase() === "root") {
-      url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root/children`;
+      url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root/children`;
     } else {
       const cleanPath = path.replace(/^\/|\/$/g, '');
-      url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/children`;
+      url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/children`;
     }
     
     const response = await axios.post(
@@ -77,14 +83,17 @@ export async function createFolder(authParams, siteDrive, path, folderName) {
 
 /**
  * Delete an empty folder in SharePoint at the specified path.
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
+ * @param {string} driveId - SharePoint drive ID
  * @param {string} path - The path of the folder to delete.
  * @returns {Promise<Object>} - A promise that resolves when the folder is deleted.
  */
-export async function deleteFolder(authParams, siteDrive, path) {
+export async function deleteFolder(tenantId, clientId, clientSecret, siteId, driveId, path) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     
     if (!path || path === "/" || path.toLowerCase() === "root") {
       throw new Error("Cannot delete root folder");
@@ -93,7 +102,7 @@ export async function deleteFolder(authParams, siteDrive, path) {
     const cleanPath = path.replace(/^\/|\/$/g, '');
     
     // Verifica che la cartella sia vuota
-    const checkUrl = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/children`;
+    const checkUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/children`;
     const checkResponse = await axios.get(checkUrl, {
       headers: {
         "Authorization": `Bearer ${accessToken}`,
@@ -105,7 +114,7 @@ export async function deleteFolder(authParams, siteDrive, path) {
     }
     
     // Elimina la cartella
-    const deleteUrl = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}`;
+    const deleteUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}`;
     await axios.delete(deleteUrl, {
       headers: {
         "Authorization": `Bearer ${accessToken}`,
@@ -121,15 +130,18 @@ export async function deleteFolder(authParams, siteDrive, path) {
 
 /**
  * Get a tree view of the folder structure in SharePoint.
- * @param {object} authParams - Microsoft Entra ID app authentication parameters.
- * @param {object} siteDrive - SharePoint site and drive identifiers.
+ * @param {string} tenantId - tenant ID
+ * @param {string} clientId - application (client) ID
+ * @param {string} clientSecret - application secret
+ * @param {string} siteId - SharePoint site ID
+ * @param {string} driveId - SharePoint drive ID
  * @param {string} path - The starting path (default: "root").
  * @param {number} maxDepth - Maximum depth to traverse (default: 10).
  * @returns {Promise<Object>} - A promise that resolves to a tree structure.
  */
-export async function getFolderTree(authParams, siteDrive, path = "root", maxDepth = 10) {
+export async function getFolderTree(tenantId, clientId, clientSecret, siteId, driveId, path = "root", maxDepth = 10) {
   try {
-    const accessToken = await getAccessToken(authParams.tenantId, authParams.clientId, authParams.clientSecret);
+    const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     
     async function buildTree(currentPath, depth = 0) {
       if (depth >= maxDepth) {
@@ -138,10 +150,10 @@ export async function getFolderTree(authParams, siteDrive, path = "root", maxDep
       
       let url = "";
       if (!currentPath || currentPath === "/" || currentPath.toLowerCase() === "root") {
-        url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root/children?$filter=folder ne null`;
+        url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root/children?$filter=folder ne null`;
       } else {
         const cleanPath = currentPath.replace(/^\/|\/$/g, '');
-        url = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/children?$filter=folder ne null`;
+        url = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/children?$filter=folder ne null`;
       }
       
       const response = await axios.get(url, {

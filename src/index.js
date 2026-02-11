@@ -66,8 +66,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The path in SharePoint to retrieve folders from" },
           },
           required: ["auth", "siteDrive", "path"],
@@ -79,8 +82,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The parent path where the folder will be created" },
             folderName: { type: "string", description: "The name of the new folder to create" },
           },
@@ -93,8 +99,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The path of the folder to delete" },
           },
           required: ["auth", "siteDrive", "path"],
@@ -106,8 +115,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The starting path (default: 'root')" },
             maxDepth: { type: "number", description: "Maximum depth to traverse (default: 10)" },
           },
@@ -120,8 +132,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The path in SharePoint to retrieve documents from" },
           },
           required: ["auth", "siteDrive", "path"],
@@ -133,8 +148,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             filePath: { type: "string", description: "The path to the file (e.g., 'Cartella_1/file.docx')" },
           },
           required: ["auth", "siteDrive", "filePath"],
@@ -146,8 +164,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             filePath: { type: "string", description: "The path where the file will be uploaded (e.g., 'Cartella_1')" },
             content: { type: "string", description: "The string or base64-encoded content of the file to upload" },
             contentType: { type: "string", description: "The MIME type of the content (e.g., 'application/pdf')" },
@@ -162,8 +183,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             filePath: { type: "string", description: "The path to the existing file to update (e.g., 'Cartella_1/file.docx')" },
             content: { type: "string", description: "The new string or base64-encoded content of the file" },
             contentType: { type: "string", description: "The MIME type of the content (e.g., 'application/pdf')" },
@@ -177,8 +201,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
+            driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             filePath: { type: "string", description: "The path to the file to delete (e.g., 'Cartella_1/file.docx')" },
           },
           required: ["auth", "siteDrive", "filePath"],
@@ -190,8 +217,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            auth: authParams,
-            siteDrive: siteDriveParams,
+            tenantId: {type: "string", description: "The directory (tenant) ID",},
+            clientId: {type: "string", description: "The application (client) ID",},
+            clientSecret: {type: "string", description: "The client secret",},
+            siteId: {type: "string",description: "The ID of the SharePoint site",},
             listId: { type: "string", description: "The ID of the SharePoint list to search in" },
             keywords: { type: "array", items: { type: "string" }, description: "Array of keywords to search for" },
             attributeName: { type: "string", description: "The document attribute to search in (e.g., 'name', 'content')" },
@@ -213,7 +242,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await getFolders(args.auth, args.siteDrive, args.path)),
+            text: JSON.stringify(await getFolders(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.path)),
           },
         ],
       };
@@ -223,7 +252,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await createFolder(args.auth, args.siteDrive, args.path, args.folderName)),
+            text: JSON.stringify(await createFolder(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.path, args.folderName)),
           },
         ],
       };
@@ -233,7 +262,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await deleteFolder(args.auth, args.siteDrive, args.path)),
+            text: JSON.stringify(await deleteFolder(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.path)),
           },
         ],
       };
@@ -243,7 +272,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await getFolderTree(args.auth, args.siteDrive, args.path, args.maxDepth)),
+            text: JSON.stringify(await getFolderTree(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.path, args.maxDepth)),
           },
         ],
       };
@@ -253,7 +282,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await getDocuments(args.auth, args.siteDrive, args.path)),
+            text: JSON.stringify(await getDocuments(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.path)),
           },
         ],
       };
@@ -263,7 +292,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await getDocumentContent(args.auth, args.siteDrive, args.filePath)),
+            text: JSON.stringify(await getDocumentContent(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.filePath)),
           },
         ],
       };
@@ -273,7 +302,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await uploadDocument(args.auth, args.siteDrive, args.filePath, args.content, args.contentType, args.overwrite)),
+            text: JSON.stringify(await uploadDocument(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.filePath, args.content, args.contentType, args.overwrite)),
           },
         ],
       };
@@ -283,7 +312,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await updateDocumentContent(args.auth, args.siteDrive, args.filePath, args.content, args.contentType)),
+            text: JSON.stringify(await updateDocumentContent(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.filePath, args.content, args.contentType)),
           },
         ],
       };
@@ -293,7 +322,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await deleteDocument(args.auth, args.siteDrive, args.filePath)),
+            text: JSON.stringify(await deleteDocument(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.driveId, args.filePath)),
           },
         ],
       };
@@ -303,7 +332,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await searchDocumentsByKeywords(args.auth, args.siteDrive, args.listId, args.keywords, args.attributeName)),
+            text: JSON.stringify(await searchDocumentsByKeywords(args.tenantId, args.clientId, args.clientSecret, args.siteId, args.listId, args.keywords, args.attributeName)),
           },
         ],
       };
