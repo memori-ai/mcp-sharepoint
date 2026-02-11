@@ -12,8 +12,8 @@ import { getDocuments, getDocumentContent, uploadDocument, updateDocumentContent
 // Crea il server
 const server = new Server(
   {
-    name: "aisuru-mcp-server-sharepoint",
-    version: "1.0.0",
+    name: "mcp-sharepoint",
+    version: "1.0.5",
   },
   {
     capabilities: {
