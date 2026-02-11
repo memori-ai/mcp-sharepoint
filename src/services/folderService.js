@@ -12,6 +12,12 @@ import axios from 'axios';
 * @returns {Promise<Array>} - A promise that resolves to an array of folder objects.
 */
 export async function getFolders(tenantId, clientId, clientSecret, siteId, driveId, path) {
+  console.log("tenantId", tenantId);
+  console.log("clientId", clientId);
+  console.log("clientSecret", clientSecret ? "****" : null);
+  console.log("siteId", siteId);
+  console.log("driveId", driveId);
+  console.log("path", path);
   try {
     let url = ""
     const accessToken = await getAccessToken(tenantId, clientId, clientSecret); // Ottieni il token di accesso
