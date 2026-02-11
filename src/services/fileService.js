@@ -78,7 +78,7 @@ export async function getDocumentContent(tenantId, clientId, clientSecret, siteI
       mimeType.includes('presentationml');     // PowerPoint
     
     // URL per scaricare il contenuto
-    let downloadUrl = `https://graph.microsoft.com/v1.0/sites/${siteDrive.siteId}/drives/${siteDrive.driveId}/root:/${cleanPath}:/content` +
+    let downloadUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/content` +
     (shouldConvertToPdf ? '?format=pdf' : '');  
     
     const contentResponse = await axios.get(downloadUrl, {

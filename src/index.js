@@ -73,7 +73,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The path in SharePoint to retrieve folders from" },
           },
-          required: ["auth", "siteDrive", "path"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "path"],
         },
       },
       {
@@ -90,7 +90,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             path: { type: "string", description: "The parent path where the folder will be created" },
             folderName: { type: "string", description: "The name of the new folder to create" },
           },
-          required: ["auth", "siteDrive", "path", "folderName"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "path", "folderName"],
         },
       },
       {
@@ -106,7 +106,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The path of the folder to delete" },
           },
-          required: ["auth", "siteDrive", "path"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "path"],
         },
       },
       {
@@ -123,7 +123,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             path: { type: "string", description: "The starting path (default: 'root')" },
             maxDepth: { type: "number", description: "Maximum depth to traverse (default: 10)" },
           },
-          required: ["auth", "siteDrive"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "path"],
         },
       },
       {
@@ -139,7 +139,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The path in SharePoint to retrieve documents from" },
           },
-          required: ["auth", "siteDrive", "path"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "path"],
         },
       },
       {
@@ -155,7 +155,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             filePath: { type: "string", description: "The path to the file (e.g., 'Cartella_1/file.docx')" },
           },
-          required: ["auth", "siteDrive", "filePath"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "filePath"],
         },
       },
       {
@@ -174,7 +174,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             contentType: { type: "string", description: "The MIME type of the content (e.g., 'application/pdf')" },
             overwrite: { type: "boolean", description: "Whether to overwrite existing files" },
           },
-          required: ["auth", "siteDrive", "filePath", "content"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "filePath", "content"],
         },
       },
       {
@@ -192,7 +192,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             content: { type: "string", description: "The new string or base64-encoded content of the file" },
             contentType: { type: "string", description: "The MIME type of the content (e.g., 'application/pdf')" },
           },
-          required: ["auth", "siteDrive", "filePath", "content"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "filePath", "content"],
         },
       },
       {
@@ -208,7 +208,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             filePath: { type: "string", description: "The path to the file to delete (e.g., 'Cartella_1/file.docx')" },
           },
-          required: ["auth", "siteDrive", "filePath"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "filePath"],
         },
       },
       {
@@ -225,7 +225,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             keywords: { type: "array", items: { type: "string" }, description: "Array of keywords to search for" },
             attributeName: { type: "string", description: "The document attribute to search in (e.g., 'name', 'content')" },
           },
-          required: ["auth", "siteDrive", "listId", "keywords", "attributeName"],
+          required: ["tenantId", "clientId", "clientSecret", "siteId", "listId", "keywords", "attributeName"],
         },
       }
     ],
