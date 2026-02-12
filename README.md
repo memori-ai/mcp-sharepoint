@@ -9,7 +9,7 @@ This server is designed with an **agent-first approach**:
 
 ---
 
-## ✨ Features
+# ✨ Features
 
 The server allows an agent to:
 
@@ -34,7 +34,7 @@ A path can/must be passed as an argument
 
 ---
 
-## 🔐 Prerequisites
+# 🔐 Prerequisites
 
 * Node.js
 * A Microsoft 365 tenant
@@ -58,7 +58,14 @@ Files.ReadWrite.All
 
 ---
 
-## Step by step guide to authorizations
+## 🧭 Step by step guide to register an app
+### if you already have an app registered you can skip this part
+1. Go to your Microsoft Entra website `https://entra.microsoft.com/...`  
+2. Click on the left menu on "app registration"  
+3. Click on "New registration"
+4. Insert a name of your liking and click "Register" 
+
+## 🧭 Step by step guide to authorizations
 ### if you already have authorizations set, you can skip this part
 1. Go to your Microsoft Entra website `https://entra.microsoft.com/...`  
 2. On the left menu click on "app registration"  
@@ -68,16 +75,11 @@ Files.ReadWrite.All
 6. Click on "Microsoft Graph"  
 7. Click on "Application authorization"  
 8. If this is your first time, or you are not familiar with authorizations, type in the search bar "sites"  
-9. Select "Sites.FullControl.All" and select "Add authorizations"
+9. Select "Sites.FullControl.All" and select "Add authorizations"  
+> ⚠️This authorization gives full control to the app, it is recommended to use the least privilege authorization needed
 10. Click on "Consent admin acces for _name_", and then click yes
-
-## Step by step guide to register an app
-### if you already have an app registered you can skip this part
-1. Go to your Microsoft Entra website `https://entra.microsoft.com/...`  
-2. Click on the left menu on "app registration"  
-3. Insert a name of your liking and click "Register"  
-
-## Step by step guide to obtain the parameters for sharepoint
+ 
+## 🧭 Step by step guide to obtain the parameters for sharepoint
 ### if you already know the client_id, client_secret, tenant_id, site_id, drive_id, list_id, you can skip this part
 1. On Microsoft Entra website `https://entra.microsoft.com/`, on the left menu click on "app registration"
 2. Click on you registered app in the table
@@ -121,7 +123,7 @@ curl -s -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/lists?select=id
 ```
 The response is a json, the attribute "value" is an array of json, each json is a different list, you only need the attribute "id"
 
-## ⚙️ Configuration
+# ⚙️ Configuration
 
 The authorization is obtained using **app variables**.
 These variables must be provided in every call.
@@ -145,7 +147,7 @@ These depends on the Sharepoint you are using.
 
 ---
 
-## 🧰 Available MCP tools
+# 🧰 Available MCP tools
 
 ### 📁 Folders
 
@@ -728,7 +730,7 @@ Search for documents containing at least one of the keywords in the given attrib
 
 ---
 
-### 🚀 Try it on Aisuru!
+# 🚀 Try it on Aisuru!
 
 This MCP server is easily integrated into [aisuru](https://aisuru.com/), our AI agent platform where you can create, test, and deploy intelligent agents with access to powerful tools like this mcp-sharepoint server.
 
