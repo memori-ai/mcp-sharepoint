@@ -80,22 +80,22 @@ curl --request POST \
   --data-urlencode "scope=https://graph.microsoft.com/.default" \
   --data-urlencode "grant_type=client_credentials"
 ```
-The response is a json, you only need the attribute "access_token"
-11. Make this request to obtain the **site id**, the domain name and site name can be seen on the URL in your Sharepoint site: `https://<DOMAIN_NAME>.sharepoint.com/sites/<SITE_NAME>/...`
+The response is a json, you only need the attribute "access_token"  
+12. Make this request to obtain the **site id**, the domain name and site name can be seen on the URL in your Sharepoint site: `https://<DOMAIN_NAME>.sharepoint.com/sites/<SITE_NAME>/...`
 ```
 curl -X GET "https://graph.microsoft.com/v1.0/sites/<DOMAIN_NAME>.sharepoint.com:/sites/<SITE_NAME>?select=id" \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -H "Accept: application/json"
 ```
-The response is a json, you only need the attribute "id"
-12. Make this request to obtain the **drive id**
+The response is a json, you only need the attribute "id"  
+13. Make this request to obtain the **drive id**
 ```
 curl -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/drives?select=id,name" \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -H "Accept: application/json"
 ```
-The response is a json, the attribute "value" is an array of json, each json is a different drive, you only need the attribute "id"
-13. Make this request to obtain the **list id**
+The response is a json, the attribute "value" is an array of json, each json is a different drive, you only need the attribute "id"  
+14. Make this request to obtain the **list id**
 ```
 curl -s -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/lists?select=id,displayName" \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
