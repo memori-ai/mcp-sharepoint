@@ -58,19 +58,37 @@ Files.ReadWrite.All
 
 ---
 
-## Step by step guide
-1. On Microsoft Entra website `https://entra.microsoft.com/`, click on the left menu on "app registration"
-2. Click on top on "New registration"
-3. Insert a name and click "Register"
-4. Open the new registered app, by clicking on its name in "app registration"
-5. On top infos you can see the **client id** and **tenant id** as ID application (client) and ID directory (tenant)
-6. Click on "Client credentials: 0 certificates, 0 secrets"
-7. Click on "New client secret"
-8. Insert the desired description and expire time, and click "Add"
-9. In the table there will be the new client secret, copy the "Value" field.  
+## Step by step guide to authorizations
+### if you already have authorizations set, you can skip this part
+1. Go to your Microsoft Entra website `https://entra.microsoft.com/...`  
+2. On the left menu click on "app registration"  
+3. Click on you registered app in the table
+4. On the second left menu click on "API authorizations"  
+5. Click on "Add authorization"  
+6. Click on "Microsoft Graph"  
+7. Click on "Application authorization"  
+8. If this is your first time, or you are not familiar with authorizations, type in the search bar "sites"  
+9. Select "Sites.FullControl.All" and select "Add authorizations"
+10. Click on "Consent admin acces for _name_", and then click yes
+
+## Step by step guide to register an app
+### if you already have an app registered you can skip this part
+1. Go to your Microsoft Entra website `https://entra.microsoft.com/...`  
+2. Click on the left menu on "app registration"  
+3. Insert a name of your liking and click "Register"  
+
+## Step by step guide to obtain the parameters for sharepoint
+### if you already know the client_id, client_secret, tenant_id, site_id, drive_id, list_id, you can skip this part
+1. On Microsoft Entra website `https://entra.microsoft.com/`, on the left menu click on "app registration"
+2. Click on you registered app in the table
+3. On top infos you can see the **client id** and **tenant id** as ID application (client) and ID directory (tenant)
+4. Click on "Client credentials: 0 certificates, 0 secrets"
+5. Click on "New client secret"
+6. Insert the desired description and expire time, and click "Add"
+7. In the table there will be the new client secret, copy the "Value" field.  
 > ⚠️You can copy it only once, after you will not be able to see the "Value" again  
-10. The copied "Value" is the **client secret**
-11. Make this request to obtain an access_token needed for the successive requests:
+8. The copied "Value" is the **client secret**
+9. Make this request to obtain an access_token needed for the successive requests:
 ```
 curl --request POST \
   --url "https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/token" \
@@ -81,21 +99,21 @@ curl --request POST \
   --data-urlencode "grant_type=client_credentials"
 ```
 The response is a json, you only need the attribute "access_token"  
-12. Make this request to obtain the **site id**, the domain name and site name can be seen on the URL in your Sharepoint site: `https://<DOMAIN_NAME>.sharepoint.com/sites/<SITE_NAME>/...`
+10. Make this request to obtain the **site id**, the domain name and site name can be seen on the URL in your Sharepoint site: `https://<DOMAIN_NAME>.sharepoint.com/sites/<SITE_NAME>/...`
 ```
 curl -X GET "https://graph.microsoft.com/v1.0/sites/<DOMAIN_NAME>.sharepoint.com:/sites/<SITE_NAME>?select=id" \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -H "Accept: application/json"
 ```
 The response is a json, you only need the attribute "id"  
-13. Make this request to obtain the **drive id**
+11. Make this request to obtain the **drive id**
 ```
 curl -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/drives?select=id,name" \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -H "Accept: application/json"
 ```
 The response is a json, the attribute "value" is an array of json, each json is a different drive, you only need the attribute "id"  
-14. Make this request to obtain the **list id**
+12. Make this request to obtain the **list id**
 ```
 curl -s -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/lists?select=id,displayName" \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
