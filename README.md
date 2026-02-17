@@ -123,6 +123,15 @@ curl -s -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/lists?select=id
 ```
 The response is a json, the attribute "value" is an array of json, each json is a different list, you only need the attribute "id"
 
+## 🧭 Step by step guide to add custom attributes/columns to Sharepoint
+### This is optional, tou can search in the default attributes/columns
+1. Go to your Sharepoint website `https://<DOMAIN_NAME>.sharepoint.com/sites/<SITE_NAME>/...`  
+2. On the left menu, click on "Documents"   
+3. On the right, after the columns, click on "+ Add column"  
+4. Select the desired type for the new column, a safe choice is "Multiple lines of text"  
+5. Enter the name of the new column, other fields are optional and not required  
+6. Click on "Save"  
+
 # ⚙️ Configuration
 
 The authorization is obtained using **app variables**.
@@ -723,7 +732,7 @@ Search for documents containing at least one of the keywords in the given attrib
   "name": "attributeName",
   "type": "string",
   "required": "true",
-  "descrciption": The document attribute to search in",
+  "descrciption": The document attribute/column to search in",
   "example": "name"
 },
 ```
