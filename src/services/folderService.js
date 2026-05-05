@@ -142,10 +142,10 @@ export async function deleteFolder(tenantId, clientId, clientSecret, siteId, dri
  * @param {string} siteId - SharePoint site ID
  * @param {string} driveId - SharePoint drive ID
  * @param {string} path - The starting path (default: "root").
- * @param {number} maxDepth - Maximum depth to traverse (default: 10).
+ * @param {number} maxDepth - Maximum depth to traverse (default: 3).
  * @returns {Promise<Object>} - A promise that resolves to a tree structure.
  */
-export async function getFolderTree(tenantId, clientId, clientSecret, siteId, driveId, path = "root", maxDepth = 10) {
+export async function getFolderTree(tenantId, clientId, clientSecret, siteId, driveId, path = "root", maxDepth = 3) {
   try {
     const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     
