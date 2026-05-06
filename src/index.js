@@ -121,7 +121,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             siteId: {type: "string",description: "The ID of the SharePoint site",},
             driveId: {type: "string",description: "The ID of the drive within the SharePoint site",},
             path: { type: "string", description: "The starting path (default: 'root')" },
-            maxDepth: { type: "number", description: "Maximum depth to traverse (default: 10)" },
+            maxDepth: { type: "number", description: "Maximum depth to traverse (default: 3)" },
           },
           required: ["tenantId", "clientId", "clientSecret", "siteId", "driveId", "path"],
         },
