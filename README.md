@@ -9,7 +9,7 @@ This server is designed with an **agent-first approach**:
 
 ---
 
-## ✨ Features
+# ✨ Features
 
 The server allows an agent to:
 
@@ -34,9 +34,9 @@ A path can/must be passed as an argument
 
 ---
 
-## 🔐 Prerequisites
+# 🔐 Prerequisites
 
-* Node.js ≥ 18
+* Node.js
 * A Microsoft 365 tenant
 * An app registered in **Microsoft Entra ID** with Graph permissions
 
@@ -58,27 +58,84 @@ Files.ReadWrite.All
 
 ---
 
-## Sharepoint guide
-1. On Sharepoint, click on the left "app registration"
-2. Click on top "New registration"
-3. Insert a name and click "Register"
-4. Open the new registered app, by clicking on its name in "app registration"
-5. On top you can see the **client id** and **tenant id**
-6. Click on top-right "Client credentials: 0 certificates, 0 secrets"
-7. Click on "New client secret"
-8. Insert the desired description and expire time, and click "Add"
-9. In the table there will be the new client secret, copy the "Value" field.  
-> ⚠️You can copy it only once, after you will not be able to see the "Value" again  
-10. The copied "Value" is the **client secret**
-11. Go to the following url: `https://graph.microsoft.com/v1.0/sites/_yourdomain_.sharepoint.com:/sites/_yoursitename_` and copy the white/plain "id" value, this is the **site id**  
-> ⚠️You need to pass the access token as header param, Authorization: access_token 
-12. Go to the following url: `https://_yourdomain_.sharepoint.com/sites/_yoursite_/_api/v2.0/drives` and copy the "id" value of the desired drive, this is the **drive id**
-13. Go to the following url: `https://_yourdomain_.sharepoint.com/sites/_yoursite_/_api/v2.0/drives/_yourdriveid_/list` and copy the "id" value of the desired list, this is the **list id**
+## 🧭 Step by step guide to register an app
+### if you already have an app registered you can skip this part
+1. Go to your Microsoft Entra website `https://entra.microsoft.com/...`  
+2. Click on the left menu on "app registration"  
+3. Click on "New registration"
+4. Insert a name of your liking and click "Register" 
 
-## ⚙️ Configuration
+## 🧭 Step by step guide to authorizations
+### if you already have authorizations set, you can skip this part
+1. Go to your Microsoft Entra website `https://entra.microsoft.com/...`  
+2. On the left menu click on "app registration"  
+3. Click on you registered app in the table
+4. On the second left menu click on "API authorizations"  
+5. Click on "Add authorization"  
+6. Click on "Microsoft Graph"  
+7. Click on "Application authorization"  
+8. If this is your first time, or you are not familiar with authorizations, type in the search bar "sites"  
+9. Select "Sites.FullControl.All" and select "Add authorizations"  
+> ⚠️This authorization gives full control to the app, it is recommended to use the least privilege authorization needed
+10. Click on "Consent admin acces for _name_", and then click yes
+ 
+## 🧭 Step by step guide to obtain the parameters for sharepoint
+### if you already know the client_id, client_secret, tenant_id, site_id, drive_id, list_id, you can skip this part
+1. On Microsoft Entra website `https://entra.microsoft.com/`, on the left menu click on "app registration"
+2. Click on you registered app in the table
+3. On top infos you can see the **client id** and **tenant id** as ID application (client) and ID directory (tenant)
+4. Click on "Client credentials: 0 certificates, 0 secrets"
+5. Click on "New client secret"
+6. Insert the desired description and expire time, and click "Add"
+7. In the table there will be the new client secret, copy the "Value" field.  
+> ⚠️You can copy it only once, after you will not be able to see the "Value" again  
+8. The copied "Value" is the **client secret**
+9. Make this request to obtain an access_token needed for the successive requests:
+```
+curl --request POST \
+  --url "https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/token" \
+  --header "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "client_id=<CLIENT_ID>" \
+  --data-urlencode "client_secret=<CLIENT_SECRET>" \
+  --data-urlencode "scope=https://graph.microsoft.com/.default" \
+  --data-urlencode "grant_type=client_credentials"
+```
+The response is a json, you only need the attribute "access_token"  
+10. Make this request to obtain the **site id**, the domain name and site name can be seen on the URL in your Sharepoint site: `https://<DOMAIN_NAME>.sharepoint.com/sites/<SITE_NAME>/...`
+```
+curl -X GET "https://graph.microsoft.com/v1.0/sites/<DOMAIN_NAME>.sharepoint.com:/sites/<SITE_NAME>?select=id" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -H "Accept: application/json"
+```
+The response is a json, you only need the attribute "id"  
+11. Make this request to obtain the **drive id**
+```
+curl -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/drives?select=id,name" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -H "Accept: application/json"
+```
+The response is a json, the attribute "value" is an array of json, each json is a different drive, you only need the attribute "id"  
+12. Make this request to obtain the **list id**
+```
+curl -s -X GET "https://graph.microsoft.com/v1.0/sites/<SITE_ID>/lists?select=id,displayName" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -H "Accept: application/json"
+```
+The response is a json, the attribute "value" is an array of json, each json is a different list, you only need the attribute "id"
+
+## 🧭 Step by step guide to add custom attributes/columns to Sharepoint
+### This is optional, tou can search in the default attributes/columns
+1. Go to your Sharepoint website `https://<DOMAIN_NAME>.sharepoint.com/sites/<SITE_NAME>/...`  
+2. On the left menu, click on "Documents"   
+3. On the right, after the columns, click on "+ Add column"  
+4. Select the desired type for the new column, a safe choice is "Multiple lines of text"  
+5. Enter the name of the new column, other fields are optional and not required  
+6. Click on "Save"  
+
+# ⚙️ Configuration
 
 The authorization is obtained using **app variables**.
-The agent needs to send these variables in every call.
+These variables must be provided in every call.
 
 ### Required app variables
 
@@ -99,58 +156,7 @@ These depends on the Sharepoint you are using.
 
 ---
 
-## 🧰 Available MCP tools
-
-### `common parameters`
-
-```
-// Microsoft Entra ID app authentication parameters
-
-authParams: {
-  {
-    "name": "clientId",
-    "type": "string",
-    "required": "true",
-    "descrciption": "The application (client) ID",
-    "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
-  },
-  {
-    "name": "clientSecret",
-    "type": "string",
-    "required": "true",
-    "descrciption": "The client secret",
-    "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
-  },
-  {
-    "name": "tenantId",
-    "type": "string",
-    "required": "true",
-    "descrciption": "The directory (tenant) ID",
-    "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
-  }
-}
-```
-
-```
-// SharePoint site and drive identifiers
-
-siteDriveParams: {
-  {
-    "name": "siteId",
-    "type": "string",
-    "required": "true",
-    "descrciption": "The ID of the SharePoint site",
-    "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
-  },
-  {
-    "name": "driveId",
-    "type": "string",
-    "required": "true",
-    "descrciption":" The ID of the drive within the SharePoint site",
-    "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
-  }
-}
-```
+# 🧰 Available MCP tools
 
 ### 📁 Folders
 
@@ -161,18 +167,39 @@ List folders in a given path.
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "path",
@@ -192,18 +219,39 @@ Create a new folder.
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "path",
@@ -229,18 +277,39 @@ Delete a folder **only if it is empty**.
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "path",
@@ -259,18 +328,39 @@ Retrieve the folder tree structure.
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "path",
@@ -298,18 +388,39 @@ List documents in a folder.
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "path",
@@ -333,18 +444,39 @@ Supported formats:
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "filePath",
@@ -363,18 +495,39 @@ Upload a new document.
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "filePath",
@@ -418,18 +571,39 @@ Fully update an existing document.
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "filePath",
@@ -462,18 +636,39 @@ Delete a document (moved to the SharePoint recycle bin).
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
+},
+{
+  "name": "driveId",
+  "type": "string",
+  "required": "true",
+  "descrciption":" The ID of the drive within the SharePoint site",
+  "example": "f!aB12Cd34E5f6aB12cd34E5f6abd37cD37aB12Cd34E5f6aB12cd34E5f6abd3712"
 },
 {
   "name": "filePath",
@@ -492,18 +687,32 @@ Search for documents containing at least one of the keywords in the given attrib
 **Input**:
 ```
 {
-  "name": "auth",
-  "type": "authParams",
+  "name": "clientId",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The application (client) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
 },
 {
-  "name": "siteDrive",
-  "type": "siteDriveParams",
+  "name": "clientSecret",
+  "type": "string",
   "required": "true",
-  "descrciption": "refer to the `common parameters` section",
-  "example": "refer to the `common parameters` section"
+  "descrciption": "The client secret",
+  "example": "1~A1B~aB12Cd34E5f6aB12cd34E5f6ab~d37cD37"
+},
+{
+  "name": "tenantId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The directory (tenant) ID",
+  "example": "ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6"
+},
+{
+  "name": "siteId",
+  "type": "string",
+  "required": "true",
+  "descrciption": "The ID of the SharePoint site",
+  "example": "namexyz.sharepoint.com,ab12cd34-e5f6-g7h8-i9j9-ab12cd34e5f6,fb12cd34-e5f6-g7h8-i9j9-ab12cd34e5f9"
 },
 {
   "name": "listId",
@@ -523,14 +732,14 @@ Search for documents containing at least one of the keywords in the given attrib
   "name": "attributeName",
   "type": "string",
   "required": "true",
-  "descrciption": The document attribute to search in",
+  "descrciption": The document attribute/column to search in",
   "example": "name"
 },
 ```
 
 ---
 
-### 🚀 Try it on Aisuru!
+# 🚀 Try it on Aisuru!
 
 This MCP server is easily integrated into [aisuru](https://aisuru.com/), our AI agent platform where you can create, test, and deploy intelligent agents with access to powerful tools like this mcp-sharepoint server.
 
