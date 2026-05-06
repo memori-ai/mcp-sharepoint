@@ -1,6 +1,6 @@
 {
   "name": "@memori.ai/mcp-sharepoint",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "MCP server that executes Sharepoint apis",
   "type": "module",
   "main": "src/index.js",
