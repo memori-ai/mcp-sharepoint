@@ -373,7 +373,7 @@ Retrieve the folder tree structure.
   "name": "maxDepth",
   "type": "number",
   "required": "false",
-  "descrciption": "Maximum depth to traverse (default: 10)",
+  "descrciption": "Maximum depth to traverse (default: 3)",
   "example": 5
 }
 ```

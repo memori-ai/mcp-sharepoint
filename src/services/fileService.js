@@ -1,6 +1,7 @@
 import { getAccessToken } from "./authService.js";
 import axios from 'axios';
 import { PDFParse } from 'pdf-parse';
+import * as XLSX from 'xlsx';
 
 // TODO: metadata is not yet implemented
 
@@ -56,31 +57,86 @@ export async function getDocuments(tenantId, clientId, clientSecret, siteId, dri
  */
 export async function getDocumentContent(tenantId, clientId, clientSecret, siteId, driveId, filePath) {
   try {
+    // Limite token per risposta all'agente
+    const MAX_TOKENS = 200000;
+    const CHARS_PER_TOKEN = 4; // stima approssimativa
+    const SAFETY_FACTOR = 0.5
+    const ALLOWED_CHARS = Math.floor(MAX_TOKENS * CHARS_PER_TOKEN * SAFETY_FACTOR);
+
     const accessToken = await getAccessToken(tenantId, clientId, clientSecret);
     const cleanPath = filePath.replace(/^\/|\/$/g, '');
-    
+
     // URL per ottenere i metadati del file
     const metadataUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}?$select=name,file,size`;
-    
+
     const metadataResponse = await axios.get(metadataUrl, {
       headers: {
         "Authorization": `Bearer ${accessToken}`,
       },
     });
-    
+
     const fileMetadata = metadataResponse.data;
     const mimeType = fileMetadata.file?.mimeType || '';
-    
+
     // Determina se convertire in PDF
-    const shouldConvertToPdf = 
+    const shouldConvertToPdf =
       mimeType.includes('wordprocessingml') || // Word
       mimeType.includes('spreadsheetml') ||    // Excel
       mimeType.includes('presentationml');     // PowerPoint
-    
-    // URL per scaricare il contenuto
+
+    let text = '';
+    let pages = 0;
+    let isTruncated = false;
+   
+    // Gestione excel, con libreria dedicata
+    if (mimeType.includes('spreadsheetml')) {
+      // URL per scaricare il contenuto
+      let downloadUrlXlsx = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/content`;
+      const bufferXlsx = await axios.get(downloadUrlXlsx, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+        },
+        responseType: 'arraybuffer'
+      });
+      const workbook = XLSX.read(bufferXlsx.data, { type: 'buffer' });
+      let totalUsedChars = 0;
+
+      for (const sheetName of workbook.SheetNames) {
+        if (isTruncated) {
+          break;
+        }
+        const sheet = workbook.Sheets[sheetName];
+        const sheetRows = XLSX.utils.sheet_to_csv(sheet).split('\n');
+        let sheetText = `--- Sheet: ${sheetName} ---\n`;
+        for (const row of sheetRows) {
+          const rowWithNewline = row + '\n';
+          if (totalUsedChars + rowWithNewline.length > ALLOWED_CHARS) {
+            isTruncated = true;
+            sheetText += "\n[... ATTENZIONE: Righe rimanenti omesse per superamento limite token ...]\n";
+            break;
+          } else {
+            sheetText += rowWithNewline;
+            totalUsedChars += rowWithNewline.length;
+          }
+        }
+        text += sheetText;
+      }
+      return {
+        name: fileMetadata.name,
+        mimeType: mimeType,
+        originalMimeType: mimeType,
+        converted: false,
+        size: bufferXlsx.data.byteLength,
+        text: text,
+        truncated: isTruncated,
+        pages: 1 // Consideriamo 1 pagina per i file Excel
+      };
+    }
+
+    // Gestione Word, PowerPoint e altri formati, con conversione a PDF e estrazione testo
     let downloadUrl = `https://graph.microsoft.com/v1.0/sites/${siteId}/drives/${driveId}/root:/${cleanPath}:/content` +
     (shouldConvertToPdf ? '?format=pdf' : '');  
-    
+
     const contentResponse = await axios.get(downloadUrl, {
       headers: {
         "Authorization": `Bearer ${accessToken}`,
@@ -88,25 +144,29 @@ export async function getDocumentContent(tenantId, clientId, clientSecret, siteI
       responseType: 'arraybuffer'
     });
 
-    const contentType = contentResponse.headers['content-type'];
-    if (!contentType?.includes('pdf')) {
-      throw new Error('Conversione in PDF fallita');
-    }
-    
+    const contentType = contentResponse.headers['content-type'] || '';
     const buffer = Buffer.from(contentResponse.data);
-    
-    // Estrai il testo dal PDF
-    let text = '';
-    let pages = 0;
-    try {
-      const parser = new PDFParse({ data: buffer });
-      const pdfData = await parser.getText()
-      text = pdfData.text;
-      pages = pdfData.numpages;
-    } catch (pdfError) {
-      console.error("Errore nell'estrazione del testo dal PDF:", pdfError);
-      text = "[Impossibile estrarre il testo dal PDF]";
-      pages = 0;
+
+    // File convertiti a PDF al download
+    if (contentType.includes('pdf')) {
+      try {
+        const parser = new PDFParse({ data: buffer });
+        const pdfData = await parser.getText()
+        text = pdfData.text;
+        pages = pdfData.numpages;
+      } catch (pdfError) {
+        console.error("Errore nell'estrazione del testo dal PDF:", pdfError);
+        text = "[Impossibile estrarre il testo dal PDF]";
+      }
+    } else { // Altri formati, senza conversione a PDF
+      text = buffer.toString('utf-8');
+      pages = 1; // Per i file non PDF, consideriamo 1 pagina
+    }
+
+    // Troncamento del testo se supera il limite consentito
+    if (text.length > ALLOWED_CHARS) {
+      text = text.substring(0, ALLOWED_CHARS) + "\n[... ATTENZIONE: Testo troncato per superamento limite token ...]";
+      isTruncated = true;
     }
     
     return {
@@ -116,7 +176,8 @@ export async function getDocumentContent(tenantId, clientId, clientSecret, siteI
       converted: shouldConvertToPdf,
       size: buffer.byteLength,
       text: text,
-      pages: pages,
+      truncated: isTruncated,
+      pages: pages
     };
   } catch (error) {
     console.error("Errore durante il recupero del contenuto del documento:", error);
