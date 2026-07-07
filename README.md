@@ -648,15 +648,15 @@ Upload a new document.
   "name": "filePath",
   "type": "string",
   "required": "true",
-  "description": "The path where the file will be uploaded",
-  "example": "cartella_1/cartella_2"
+  "description": "The path where the file will be uploaded and the name and extension of the file",
+  "example": "cartella_1/cartella_2/new_file.txt"
 },
 {
   "name": "content",
   "type": "string",
   "required": "true",
-  "description": "The string or base64-encoded content of the file to upload",
-  "example": "Questo è il testo del doc .txt"
+  "description": "The base64-encoded content of the file to upload",
+  "example": "dGVzdCB1cGxvYWQgMjAyNjA3MDc="
 },
 {
   "name": "contentType",
